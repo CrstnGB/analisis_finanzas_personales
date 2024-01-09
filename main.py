@@ -5,6 +5,7 @@ import numpy as np
 import pandas as pd
 import scipy as sp
 import math
+from datetime import datetime
 from functions.func_charts import *
 
 
@@ -534,6 +535,18 @@ with PdfPages('prueba.pdf') as pdf:
     ultimo_dia = max(df['Fecha'])
     n_dias = (ultimo_dia - primer_dia).days
 
+    #Se escribe una función para estampar la fecha en una figura y el rango de fechas analizado
+    def estampar_fechas(fig):
+        fig.text(0.05, 0.05, f"Fecha de análisis: {datetime.now().strftime('%d.%m.%Y')}",
+                  horizontalalignment='left', verticalalignment='top', fontsize=10)
+        fig.text(0.05, 0.03, f"Rango de fechas analizado: {primer_dia.strftime('%d.%m.%Y')} al "
+                              f"{ultimo_dia.strftime('%d.%m.%Y')}", horizontalalignment='left', verticalalignment='top',
+                  fontsize=10)
+
+    #Se escribe en la gráfica general en la primera página el rango de fechas analizado
+    estampar_fechas(fig1)
+    estampar_fechas(fig2)
+
     filtro = df_ingresos.groupby('Concep_Categoria')['Importe'].sum().sort_values(ascending = False)
     valores = list(filtro.values)
     etiquetas = list(filtro.index)
@@ -564,6 +577,8 @@ with PdfPages('prueba.pdf') as pdf:
     titulo = f'Top 20 Concepto Aclarativo - General - Gastos'
     barh_chart(ax2_4, valores, etiquetas, titulo, unidad, colormap_rojos)
 
+
+
     pdf.savefig(fig1)
     plt.close(fig1)
     pdf.savefig(fig2)
@@ -581,7 +596,7 @@ with PdfPages('prueba.pdf') as pdf:
     #Se generan las gráficas de ingresos
     i_grafica = 0
     for i in range(n_figures_ingresos):
-        plt.figure()
+        fig = plt.figure()
         gs_loop = GridSpec(n_graficas_filas_figure, n_graficas_column_figure, height_ratios=[1, 1, 1, 1], width_ratios=[1, 1])
         for j in range(n_graficas_filas_figure):
             for k in range(n_graficas_column_figure):
@@ -599,13 +614,14 @@ with PdfPages('prueba.pdf') as pdf:
                 i_grafica += 1
         # Ajustar la separación horizontal entre las columnas usando wspace
         plt.subplots_adjust(hspace = 0.5)
+        estampar_fechas(fig)
         pdf.savefig()
         plt.close()
 
     #Se generan las gráficas de gastos
     i_grafica = 0
     for i in range(n_figures_gastos):
-        plt.figure()
+        fig = plt.figure()
         gs_loop = GridSpec(n_graficas_filas_figure, n_graficas_column_figure, height_ratios=[1, 1, 1, 1], width_ratios=[1, 1])
         for j in range(n_graficas_filas_figure):
             for k in range(n_graficas_column_figure):
@@ -622,5 +638,6 @@ with PdfPages('prueba.pdf') as pdf:
                 barh_chart(ax_loop, valores, etiquetas, titulo, unidad, colormap_rojos)
                 i_grafica += 1
         plt.subplots_adjust(hspace = 0.5)
+        estampar_fechas(fig)
         pdf.savefig()
         plt.close()
