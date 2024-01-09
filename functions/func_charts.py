@@ -53,30 +53,24 @@ def salary_tracing(df, ax):
     # Se añade información al gráfico
 
     # Saldo inicial
-    ax.text(etiquetas.iloc[0], valores.iloc[0], f"Saldo Inicial: {int(valores[0])} €", va='top', ha='left',
-             fontweight='bold', fontsize=10, color='black')
+    ax.scatter(etiquetas.iloc[0], valores.iloc[0], marker='o', color='none', edgecolor='black', linewidth = 2,
+               s=100, label=f"Saldo inicial: {int(valores[0])} €")
     # Máximo balance
     balance = int(valor_final - valor_inicial)
-    ax.text(etiquetas.iloc[pos_max_balance], valores.iloc[pos_max_balance],
-             f"Max. Balance: +{max_balance} €\nSaldo: {int(valores[pos_max_balance])} €", va='center', ha='right',
-             fontweight='bold', fontsize=10, color='g')
     ax.scatter(etiquetas.iloc[pos_max_balance], valores.iloc[pos_max_balance], marker='o', color='none', edgecolor='g',
-                s=100)
+                linewidth = 2, s=100, label = f"Max. Balance: +{max_balance} €\nSaldo: {int(valores[pos_max_balance])} €")
     # Mínimo balance
-    ax.text(etiquetas.iloc[pos_min_balance], valores.iloc[pos_min_balance],
-             f"Min Balance: {min_balance} €\nSaldo: {int(valores[pos_min_balance])} €", va='center', ha='right',
-             fontweight='bold', fontsize=10, color='r')
     ax.scatter(etiquetas.iloc[pos_min_balance], valores.iloc[pos_min_balance], marker='o', color='none', edgecolor='r',
-                s=100)
+                linewidth = 2, s=100, label = f"Min Balance: {min_balance} €\nSaldo: {int(valores[pos_min_balance])} €")
     # balance final
-    color_balance = 'r' if balance < 0 else 'g'
-    ax.text(etiquetas.iloc[-1], max(valores), f"Balance final: {balance} €\nSaldo Final: {int(valor_final)} €",
-             va='top', ha='right', fontweight='bold', fontsize=10, color=color_balance)
+    ax.scatter(etiquetas.iloc[-1], valores.iloc[-1], marker='o', color='none', edgecolor='purple',
+               linewidth=2, s=100, label=f"Balance final: {balance} €\nSaldo Final: {int(valor_final)} €")
+
     # Dibuja constante como la barrera entre balance negativo o positivo
     ax.axhline(valores[0], color='r', linestyle='--', label='Límite Ahorro / Gasto')
     #ax.set_xlabel('Fecha')
-    ax.set_ylabel('€')
-    ax.legend(loc='lower left')
+    #ax.set_ylabel('€')
+    ax.legend(bbox_to_anchor=(1, 1))
     ax.set_title('Evolución del Saldo')
 
 def monthly_comparison(df_ingresos, df_gastos, ax):
@@ -112,12 +106,27 @@ def monthly_comparison(df_ingresos, df_gastos, ax):
                  fontdict={'weight': 'bold', 'size': 12})
 
     ax.set_title('Ingresos VS Gastos Mensual')
-    ax.set_ylabel("€")
+    #ax.set_ylabel("€")
     #ax.set_xlabel('Months')
-    ax.legend()
+    ax.legend(bbox_to_anchor=(1, 1))
 
     #df_ingresos.drop('mes', inplace=True, axis=1)
     #df_gastos.drop('mes', inplace=True, axis=1)
+
+def yearly_comparison(df_ingresos, df_gastos, ax):
+    filtro_gastos = df_gastos['Importe'].sum()
+    filtro_ingresos = df_ingresos['Importe'].sum()
+
+    valores = [filtro_ingresos, filtro_gastos]
+    etiquetas = ['Ingresos An.', 'Gastos An.']
+
+    ax.barh(etiquetas, valores, color = colores_I_G)
+
+    for i, valor in enumerate(valores):
+        ax.text(valor / 2, i, f"{int(valor)} €", va = 'center', ha = 'center', weight = 'bold', color = 'white')
+
+    ax.set_title('Ingresos VS Gastos Anual')
+    ax.legend()
 
 def generate_trendline(valores):
     x = np.linspace(0, len(valores), len(valores))
@@ -156,8 +165,8 @@ def acum_comparison(df_ingresos, df_gastos, ax):
 
     ax.set_title("Acumulado Ingresos vs Gastos")
     #ax.set_xlabel("Fecha")
-    ax.set_ylabel("€")
-    ax.legend()
+    #ax.set_ylabel("€")
+    ax.legend(bbox_to_anchor=(1, 1))
 
 def pie_chart(ax, valores, etiquetas, titulo, unidad = '€', colormap = plt.get_cmap('cividis')):
     # Se definen los colores
