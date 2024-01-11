@@ -7,6 +7,9 @@ import scipy as sp
 import math
 from datetime import datetime
 from functions.func_charts import *
+import json
+import os
+from functions.func_auxiliares import *
 
 
 # 0-PreConfiguración para las gráficas
@@ -83,6 +86,10 @@ with PdfPages('prueba.pdf') as pdf:
     ruta = r'C:\Users\Cristian\Documents\6- Proyectos\2- Python\2-Analisis finanzas personales\Extractos Bancarios'
     nombre_archivo = '01.01.2023-15.12.2023.comb.xlsx'
     df = pd.read_excel(ruta + "/" + nombre_archivo)
+
+    #Se eliminan las tildes del dataframe para evitar errores de lectura
+    # Función para eliminar tildes
+    df['Concepto'] = df['Concepto'].apply(eliminar_tildes)
 
     # 1.2- Renombrar Columnas y borrar columnas
     df.rename(columns={"Fecha de la operación": "Fecha"}, inplace = True)
@@ -307,7 +314,8 @@ with PdfPages('prueba.pdf') as pdf:
 
     #3.2- AGRUPACION DE VARIABLES CATEGÓRICAS
     #INGRESOS
-    df_ingresos['Concepto'][df_ingresos['Concepto'].str.contains('construcciones ferroviarias')] = 'trf. construcciones ferroviarias de madrid sl'
+
+    #df_ingresos['Concepto'][df_ingresos['Concepto'].str.contains('construcciones ferroviarias')] = 'trf. construcciones ferroviarias de madrid sl'
 
     '''Se puede crear unas categorizaciones superiores según:
     
@@ -335,28 +343,36 @@ with PdfPages('prueba.pdf') as pdf:
     Además, se crearán listas con palabras clave a buscar en el concepto para poder agrupar apropiadamente.
     '''
     df_ingresos['Concep_Aclarativo'] = None
-
-    #Asignaciones de concepto aclarativo
-
-    df_ingresos.loc[df_ingresos['Concepto'].str.contains('construcciones ferroviarias', case = False), 'Concep_Aclarativo'] = 'Cofema'
-    df_ingresos.loc[df_ingresos['Concepto'].str.contains('pensión', case = False), 'Concep_Aclarativo'] = 'Pensión Baja Pat/Mat'
-    df_ingresos.loc[df_ingresos['Concepto'].str.contains('adecco', case = False), 'Concep_Aclarativo'] = 'Navantia Adecco'
-    df_ingresos.loc[df_ingresos['Concepto'].str.contains('cristina miras', case = False), 'Concep_Aclarativo'] = 'Vitalia'
-    df_ingresos.loc[df_ingresos['Concepto'].str.contains('a.e.a.t', case = False), 'Concep_Aclarativo'] = 'Hacienda'
-
-    df_ingresos.loc[df_ingresos['Concep_Aclarativo'].isna(), 'Concep_Aclarativo'] = 'Otros'
-
-    salarios_cristian = ['construcciones ferroviarias', 'adecco']
-    salarios_cristina = ['cristina miras']
-    hacienda = ['a.e.a.t', 'pensión']
-
-    #Asignaciones de concepto categoria
     df_ingresos['Concep_Categoria'] = None
-    df_ingresos.loc[df_ingresos['Concepto'].str.contains('|'.join(salarios_cristian), case = False), 'Concep_Categoria'] = 'Salario Cristian'
-    df_ingresos.loc[df_ingresos['Concepto'].str.contains('|'.join(salarios_cristina), case = False), 'Concep_Categoria'] = 'Salario Cristina'
-    df_ingresos.loc[df_ingresos['Concepto'].str.contains('|'.join(hacienda), case = False), 'Concep_Categoria'] = 'Pens. & Hac.'
+    df_gastos['Concep_Aclarativo'] = None
+    df_gastos['Concep_Categoria'] = None
 
-    df_ingresos.loc[df_ingresos['Concep_Categoria'].isna(), 'Concep_Categoria'] = 'Otros'
+    def obtener_clasificaciones(df, tipo):
+        #Asignaciones de concepto aclarativo
+        #Obtener la ruta al directorio actual del script
+        directorio_actual = os.path.dirname(os.path.abspath(__file__))
+        nuevas_columnas = ['Concep_Aclarativo', 'Concep_Categoria']
+        for columna in nuevas_columnas:
+            #Construir la ruta al archivo dentro de la carpeta relativa
+            ruta_archivo = os.path.join(directorio_actual, 'jsons', f'{columna}_{tipo}.json')
+            #Leer el archivo JSON
+            with open(ruta_archivo, 'r', encoding='utf-8') as archivo_json:
+                datos_json = json.load(archivo_json)
+
+            #Se escribe sobre la nueva columna accediendo al json
+            for clave, valor in datos_json.items():
+                if isinstance(valor, list):
+                    valor = '|'.join(valor)
+                df.loc[df['Concepto'].str.contains(valor, case = False), columna] = clave
+
+            df.loc[df[columna].isna(), columna] = 'Otros'
+        return df
+
+    #Asignaciones de la clasificación para ingresos
+    df_ingresos = obtener_clasificaciones(df_ingresos, 'ingresos')
+
+
+
     #GASTOS
     '''Claramente, tal y como ocurre con df_ingresos, se puede dividir claramente en Tipo_Pago. Sin embargo, los Tipo_Concepto son más variados y hay que tratarlos de forma diferente.
     
@@ -394,141 +410,10 @@ with PdfPages('prueba.pdf') as pdf:
     '''Se van a crear unas categorías superiores para una mayor agrupación de conceptos. 
     Esto es un trabajo muy personal porque dependerá en gran medida del dueño del dataset. 
     La cantidad y el detalle que se quiera alcanzar dependerá será una decisión personal. 
-    Sin embargo, se aconseja, al menos, categorizar el top 20 de los gastos comunes.
-    
-    Se crearán dos nuevas columnas:
-    1. Concep_Aclarativo
-    2. Concep_Categoria
-    
-    Además, se crearán listas con palabras clave a buscar en el concepto para poder agrupar apropiadamente.
-    '''
+    Sin embargo, se aconseja, al menos, categorizar el top 20 de los gastos comunes.'''
 
-    supermercados_espania = [
-        'mercadona', 'dia', 'carref', 'eliant', 'lidl', 'fruteria', 'supeco', 'aldi',
-        'eroski', 'caprabo', 'hipercor', 'alcampo', 'coviran', 'superdino', 'myprotein', 'hsn',
-        'supersol', 'froiz', 'masymas', 'mas', 'mercadal', 'merkabici', 'ahorramas', 'tuotrosuper',
-        'tusuper', 'ecocenter', 'coviran', 'masfresco', 'sumapaz', 'caserito',
-        'masymas', 'mascoop', 'consumcoop', 'saludable', 'amazonfresh', 'ulabox',
-        'hiperusera', 'isoySuper', 'tendamarket', 'primaprix', 'capraboacasa',
-        'carritus', 'mistral', 'mundofood', 'delSuperes',
-        'hiperber', 'ycoms', 'tabaola', 'youzee', 'entrellaves', 'delhortaeacasa',
-        'autofacil', 'ontruck', 'notelapierdas'
-    ]
-    estaciones_combustible_espania = [
-        'petroprix', 'petrol', 'autofuel', 'ballenoil', 'Repsol',
-        'Cepsa', 'BP', 'Galp', 'Shell', 'Avia',
-        'E.S. Auchan', 'E.S. Alcampo', 'E.S. Carrefour', 'BonÁrea', 'Esclatoil',
-        'Esso', 'GALP', 'Iberdoex', 'Iturmendi', 'Meroil',
-        'Petrocat', 'Staroil', 'Valcarce', 'VLC', 'Agip',
-        'Beroil', 'Campsa', 'Disa', 'Energy', 'Eurocam',
-        'Farruco', 'Gases Express Nieto', 'Integra Oil', 'Lecta', 'Magna Oil',
-        'MGOil', 'Molgas', 'Oil Albera', 'Oil Precio', 'PetroAlacant',
-        'PetroPrix', 'Petromax', 'Petromiralmag', 'Petronor', 'Petroprix',
-        'Petroset', 'Plenoil', 'Prellezo', 'Prio', 'Red Ahorro',
-        'Repsol', 'SAGIM', 'Shell', 'Staroil', 'Tamoil',
-        'Tegasa', 'Urbaprix', 'Urbia', 'VCC', 'VITOGAS', 'hm oil'
-    ]
-    companias_luz_espania = [
-        'Endesa', 'Iberdrola', 'Naturgy', 'Imagina energ', 'EDP España', 'Viesgo', 'Energía XXI', 'Holaluz', 'Aldro Energía',
-        'Podo', 'Lucera', 'Aura Energía', 'HidroCantábrico', 'Energía Sostenible', 'Fortia Energía', 'Som Energia',
-        'Factor Energía', 'Cepsa Energía', 'Fenie Energía', 'Gana Energía', 'Energía Verde', 'Gas Natural Fenosa',
-        'Repsol Electricidad y Gas', 'EDP Renewables', 'Holaluz', 'Iberia Solar', 'Acciona Energía'
-    ]
-    sitios_compras_web_espana = [
-        'Amazon', 'AliExpress', 'eBay', 'Wallapop', 'Temu', 'back market',
-        'El Corte Inglés', 'Fnac', 'MediaMarkt', 'Carrefour Online',
-        'Zalando', 'Worten', 'PCComponentes',
-        'Ulabox', 'Veepee',
-        'Tiendanimal', 'PcBox', 'MobileFun',
-        'Ulabox', 'Veepee', 'Tiendanimal', 'PcBox', 'MobileFun', 'marketplace'
-    ]
-
-    tiendas_espana = [
-        'El Corte Ingles', 'Primark', 'MediaMarkt', 'Zara', 'Mango', 'Decathlon',
-        'Leroy Merlin', 'Aki Bricolaje', 'Ikea', 'FNAC', 'Toys "R" Us', 'jd', 'kiabi',
-        'Sprinter', 'Bershka', 'Pull&Bear', 'Stradivarius', 'Conforama', 'newyorker',
-        'Casa del Libro', 'PCComponentes', 'Leroy Merlin', 'El Ganso', 'Primor', 'alvaro moreno'
-    ]
-
-    gimnasios = ['blue gorila', 'gim', 'gym', 'vigor']
-
-    df_gastos['Concep_Aclarativo'] = None
-
-    #Asignaciones de concepto aclarativo
-    df_gastos.loc[df_gastos['Concepto'].str.contains('|'.join(supermercados_espania), case = False), 'Concep_Aclarativo'] = 'Supermercados'
-    df_gastos.loc[df_gastos['Concepto'].str.contains('|'.join(estaciones_combustible_espania), case = False), 'Concep_Aclarativo'] = 'Gasolina'
-    df_gastos.loc[df_gastos['Concepto'].str.contains('|'.join(companias_luz_espania), case = False), 'Concep_Aclarativo'] = 'Electricidad'
-    df_gastos.loc[df_gastos['Concepto'].str.contains('|'.join(gimnasios), case = False), 'Concep_Aclarativo'] = 'Gym'
-    df_gastos.loc[df_gastos['Concepto'].str.contains('hidralia', case = False), 'Concep_Aclarativo'] = 'Agua'
-    df_gastos.loc[df_gastos['Concepto'].str.contains('5618504251', case = False), 'Concep_Aclarativo'] = 'Préstamo Coche'
-    df_gastos.loc[df_gastos['Concepto'].str.contains('farmacia', case = False), 'Concep_Aclarativo'] = 'Farmacia'
-    df_gastos.loc[df_gastos['Concepto'].str.contains('multitranquilidad', case = False), 'Concep_Aclarativo'] = 'Seguro Hogar'
-    df_gastos.loc[df_gastos['Concepto'].str.contains('adeslas', case = False), 'Concep_Aclarativo'] = 'Seguro Salud'
-    df_gastos.loc[df_gastos['Concepto'].str.contains('web recaudacion', case = False), 'Concep_Aclarativo'] = 'IBI'
-    df_gastos.loc[df_gastos['Concepto'].str.contains('5589240554', case = False), 'Concep_Aclarativo'] = 'Hipoteca Hogar'
-    df_gastos.loc[df_gastos['Concepto'].str.contains('rosa maria rodriguez fernandez', case = False), 'Concep_Aclarativo'] = 'Garaje'
-    df_gastos.loc[df_gastos['Concepto'].str.contains('5660654871', case = False), 'Concep_Aclarativo'] = 'Comunidad Hogar'
-    df_gastos.loc[df_gastos['Concepto'].str.contains('cocinas el pinar', case = False), 'Concep_Aclarativo'] = 'Ref. Cocina'
-    df_gastos.loc[df_gastos['Concepto'].str.contains('pepe mobile', case = False), 'Concep_Aclarativo'] = 'Internet y Móvil'
-    df_gastos.loc[df_gastos['Concepto'].str.contains('cafe', case = False), 'Concep_Aclarativo'] = 'Cafeteria'
-    df_gastos.loc[df_gastos['Concepto'].str.contains('restaurant', case = False), 'Concep_Aclarativo'] = 'Restaurante'
-    df_gastos.loc[df_gastos['Concepto'].str.contains('bar', case = False), 'Concep_Aclarativo'] = 'Bar'
-    df_gastos.loc[df_gastos['Concepto'].str.contains('aeat', case = False), 'Concep_Aclarativo'] = 'Hacienda'
-    df_gastos.loc[df_gastos['Concepto'].str.contains('picaz', case = False), 'Concep_Aclarativo'] = 'Ref. Despacho'
-    df_gastos.loc[df_gastos['Concepto'].str.contains('sotelo|eulalio', case = False), 'Concep_Aclarativo'] = 'Ref. Ventanas'
-    df_gastos.loc[df_gastos['Concepto'].str.contains('david rodriguez garcia', case = False), 'Concep_Aclarativo'] = 'Inst. Aire Acond.'
-    df_gastos.loc[df_gastos['Concepto'].str.contains('valenciana', case = False), 'Concep_Aclarativo'] = 'M. Big Data y DS'
-    df_gastos.loc[df_gastos['Concepto'].str.contains('|'.join(sitios_compras_web_espana), case = False), 'Concep_Aclarativo'] = 'Compras Web'
-    df_gastos.loc[df_gastos['Concepto'].str.contains('|'.join(tiendas_espana), case = False), 'Concep_Aclarativo'] = 'Compra Tiendas'
-    df_gastos.loc[df_gastos['Concepto'].str.contains('dental', case = False), 'Concep_Aclarativo'] = 'Dentista'
-    df_gastos.loc[df_gastos['Concepto'].str.contains('taller', case = False), 'Concep_Aclarativo'] = 'Mantenimiento Coche'
-    df_gastos.loc[df_gastos['Concepto'].str.contains('booking', case = False), 'Concep_Aclarativo'] = 'Hotel/Hostal'
-    df_gastos.loc[df_gastos['Concepto'].str.contains('limpieza', case = False), 'Concep_Aclarativo'] = 'Servicio Limpieza'
-    df_gastos.loc[df_gastos['Concepto'].str.contains('regalo', case = False), 'Concep_Aclarativo'] = 'Regalo'
-    df_gastos.loc[df_gastos['Concepto'].str.contains('fisiotera', case = False), 'Concep_Aclarativo'] = 'Fisioterapeuta'
-    df_gastos.loc[df_gastos['Concepto'].str.contains('linea directa aseguradora', case = False), 'Concep_Aclarativo'] = 'Seguro coche'
-    df_gastos.loc[df_gastos['Concepto'].str.contains('atitude estavel', case = False), 'Concep_Aclarativo'] = 'Hotel Despedida Sergio'
-
-    df_gastos.loc[df_gastos['Concep_Aclarativo'].isna(), 'Concep_Aclarativo'] = 'Otros'
-
-    #Ahora igual con Concep_Categoria
-    df_gastos['Concep_Categoria'] = None
-
-    df_gastos.loc[df_gastos['Concepto'].str.contains('|'.join(supermercados_espania), case = False), 'Concep_Categoria'] = 'Supermercados'
-    df_gastos.loc[df_gastos['Concepto'].str.contains('|'.join(estaciones_combustible_espania), case = False), 'Concep_Categoria'] = 'Transporte'
-    df_gastos.loc[df_gastos['Concepto'].str.contains('|'.join(companias_luz_espania), case = False), 'Concep_Categoria'] = 'Hogar'
-    df_gastos.loc[df_gastos['Concepto'].str.contains('|'.join(gimnasios), case = False), 'Concep_Aclarativo'] = 'Deporte'
-    df_gastos.loc[df_gastos['Concepto'].str.contains('hidralia', case = False), 'Concep_Categoria'] = 'Hogar'
-    df_gastos.loc[df_gastos['Concepto'].str.contains('5618504251', case = False), 'Concep_Categoria'] = 'Transporte'
-    df_gastos.loc[df_gastos['Concepto'].str.contains('farmacia|fcia', case = False), 'Concep_Categoria'] = 'Salud'
-    df_gastos.loc[df_gastos['Concepto'].str.contains('multitranquilidad', case = False), 'Concep_Categoria'] = 'Hogar'
-    df_gastos.loc[df_gastos['Concepto'].str.contains('adeslas', case = False), 'Concep_Categoria'] = 'Salud'
-    df_gastos.loc[df_gastos['Concepto'].str.contains('web recaudacion', case = False), 'Concep_Categoria'] = 'Hogar'
-    df_gastos.loc[df_gastos['Concepto'].str.contains('5589240554', case = False), 'Concep_Categoria'] = 'Hogar'
-    df_gastos.loc[df_gastos['Concepto'].str.contains('rosa maria rodriguez fernandez', case = False), 'Concep_Categoria'] = 'Transporte'
-    df_gastos.loc[df_gastos['Concepto'].str.contains('5660654871', case = False), 'Concep_Categoria'] = 'Hogar'
-    df_gastos.loc[df_gastos['Concepto'].str.contains('cocinas el pinar', case = False), 'Concep_Categoria'] = 'Mejora Hogar'
-    df_gastos.loc[df_gastos['Concepto'].str.contains('pepe mobile', case = False), 'Concep_Categoria'] = 'Hogar'
-    df_gastos.loc[df_gastos['Concepto'].str.contains('cafe', case = False), 'Concep_Categoria'] = 'Cafet. & Rest'
-    df_gastos.loc[df_gastos['Concepto'].str.contains('restaurant', case = False), 'Concep_Categoria'] = 'Cafet. & Rest'
-    df_gastos.loc[df_gastos['Concepto'].str.contains('bar', case = False), 'Concep_Categoria'] = 'Cafet. & Rest'
-    df_gastos.loc[df_gastos['Concepto'].str.contains('aeat', case = False), 'Concep_Categoria'] = 'Hacienda'
-    df_gastos.loc[df_gastos['Concepto'].str.contains('picaz', case = False), 'Concep_Categoria'] = 'Mejora Hogar'
-    df_gastos.loc[df_gastos['Concepto'].str.contains('sotelo|eulalio', case = False), 'Concep_Categoria'] = 'Mejora Hogar'
-    df_gastos.loc[df_gastos['Concepto'].str.contains('david rodriguez garcia', case = False), 'Concep_Categoria'] = 'Mejora Hogar'
-    df_gastos.loc[df_gastos['Concepto'].str.contains('valenciana', case = False), 'Concep_Categoria'] = 'Formación'
-    df_gastos.loc[df_gastos['Concepto'].str.contains('|'.join(sitios_compras_web_espana), case = False), 'Concep_Categoria'] = 'Compras Tiendas y web'
-    df_gastos.loc[df_gastos['Concepto'].str.contains('|'.join(tiendas_espana), case = False), 'Concep_Categoria'] = 'Compras Tiendas y web'
-    df_gastos.loc[df_gastos['Concepto'].str.contains('dental', case = False), 'Concep_Categoria'] = 'Salud'
-    df_gastos.loc[df_gastos['Concepto'].str.contains('taller', case = False), 'Concep_Categoria'] = 'Transporte'
-    df_gastos.loc[df_gastos['Concepto'].str.contains('booking', case = False), 'Concep_Categoria'] = 'Viajes y Hoteles'
-    df_gastos.loc[df_gastos['Concepto'].str.contains('limpieza', case = False), 'Concep_Categoria'] = 'Hogar'
-    df_gastos.loc[df_gastos['Concepto'].str.contains('regalo', case = False), 'Concep_Categoria'] = 'Regalos'
-    df_gastos.loc[df_gastos['Concepto'].str.contains('fisiotera', case = False), 'Concep_Categoria'] = 'Salud'
-    df_gastos.loc[df_gastos['Concepto'].str.contains('linea directa aseguradora', case = False), 'Concep_Categoria'] = 'Transporte'
-    df_gastos.loc[df_gastos['Concepto'].str.contains('atitude estavel', case = False), 'Concep_Categoria'] = 'Viajes y Hoteles'
-
-    df_gastos.loc[df_gastos['Concep_Categoria'].isna(), 'Concep_Categoria'] = 'Otros'
+    # Asignaciones de la clasificación para ingresos
+    df_gastos = obtener_clasificaciones(df_gastos, 'gastos')
 
     #Distribucion de variables categóricas
     primer_dia = min(df['Fecha'])
