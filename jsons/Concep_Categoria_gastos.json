@@ -1,57 +1,19 @@
 {
-    "Supermercados": [
-        "mercadona", "dia", "carref", "eliant", "lidl", "fruteria", "supeco", "aldi",
-        "eroski", "caprabo", "hipercor", "alcampo", "coviran", "superdino", "myprotein", "hsn",
-        "supersol", "froiz", "ahorramas", "tuotrosuper",
-        "tusuper", "ecocenter", "coviran", "masfresco", "sumapaz", "caserito",
-        "masymas", "mascoop", "consumcoop", "saludable", "amazonfresh", "ulabox",
-        "hiperusera", "isoySuper", "tendamarket", "primaprix", "capraboacasa",
-        "carritus", "mistral", "mundofood", "delSuperes",
-        "hiperber", "ycoms", "tabaola", "youzee", "entrellaves", "delhortaeacasa",
-        "ontruck", "notelapierdas"
-    ],
+    "Supermercados": ["Supermercados"],
     "Transporte": [
-        "petroprix", "petrol", "autofuel", "ballenoil", "Repsol",
-        "Cepsa", "BP", "Galp", "Shell", "Avia",
-        "E.S. Auchan", "E.S. Alcampo", "E.S. Carrefour", "Bonarea", "Esclatoil",
-        "Esso", "GALP", "Iberdoex", "Iturmendi", "Meroil",
-        "Petrocat", "Staroil", "Valcarce", "VLC", "Agip",
-        "Beroil", "Campsa", "Disa", "Energy", "Eurocam",
-        "Farruco", "Gases Express Nieto", "Integra Oil", "Lecta", "Magna Oil",
-        "MGOil", "Molgas", "Oil Albera", "Oil Precio", "PetroAlacant",
-        "PetroPrix", "Petromax", "Petromiralmag", "Petronor", "Petroprix",
-        "Petroset", "Plenoil", "Prellezo", "Prio", "Red Ahorro",
-        "Repsol", "SAGIM", "Shell", "Staroil", "Tamoil",
-        "Tegasa", "Urbaprix", "Urbia", "VCC", "VITOGAS", "hm oil",
-        "5618504251", "rosa maria rodriguez fernandez", "taller",
-        "linea directa aseguradora"
+        "Gasolina", "Prestamo Coche", "Garaje", "Mantenimiento Coche",
+        "Seguro coche"
     ],
     "Hogar": [
-        "Endesa", "Iberdrola", "Naturgy", "Imagina energ", "EDP España", "Viesgo", "Energia XXI", "Holaluz", "Aldro Energia",
-        "Podo", "Lucera", "Aura Energia", "HidroCantabrico", "Energia Sostenible", "Fortia Energia", "Som Energia",
-        "Factor Energia", "Cepsa Energia", "Fenie Energia", "Gana Energia", "Energia Verde", "Gas Natural Fenosa",
-        "Repsol Electricidad y Gas", "EDP Renewables", "Holaluz", "Iberia Solar", "Acciona Energia",
-        "hidralia", "multitranquilidad", "web recaudacion", "5589240554", "5660654871",
-        "pepe mobile", "limpieza"
+        "Electricidad", "Agua", "Seguro Hogar", "IBI", "Hipoteca Hogar",
+         "Comunidad Hogar", "Internet y Movil", "Servicio Limpieza"
     ],
-    "Deporte": ["blue gorila", "gim", "gym", "vigor"],
-    "Mejora Hogar": ["cocinas el pinar", "picaz", "sotelo", "eulalio", "david rodriguez garcia"],
-    "Cafet. & Rest": ["cafe", "restaurant", "bar"],
-    "Hacienda": "aeat",
-    "Formacion": "valenciana",
-    "Compras Tiendas y web": [
-        "Amazon", "AliExpress", "eBay", "Wallapop", "Temu", "back market",
-        "El Corte Ingles", "Fnac", "MediaMarkt", "Carrefour Online",
-        "Zalando", "Worten", "PCComponentes",
-        "Ulabox", "Veepee",
-        "Tiendanimal", "PcBox", "MobileFun",
-        "Ulabox", "Veepee", "Tiendanimal", "PcBox", "MobileFun", "marketplace",
-        "El Corte Ingles", "Primark", "MediaMarkt", "Zara", "Mango", "Decathlon",
-        "Leroy Merlin", "Aki Bricolaje", "Ikea", "FNAC", "jd", "kiabi",
-        "Sprinter", "Bershka", "Pull&Bear", "Stradivarius", "Conforama", "newyorker",
-        "Casa del Libro", "PCComponentes", "Leroy Merlin", "El Ganso", "Primor", "alvaro moreno"
-    ],
-    "Salud": ["farmacia", "fcia", "adeslas", "dental", "fisiotera"],
-    "Regalos": "regalo",
-    "Viajes y Hoteles": ["Booking", "atitude estavel"]
+    "Mejora Hogar": ["Ref. Cocina", "Ref. Despacho", "Ref. Ventanas", "Inst. Aire Acond."],
+    "Ocio": ["Cafet, Bares y Rest.", "Cine"],
+    "Impuestos Hacienda": ["Declaracion Renta"],
+    "Formacion": ["M. Big Data y DS"],
+    "Compras Tiendas y web": ["Compras Web", "Compra Tiendas"],
+    "Salud": ["Farmacia", "Seguro Salud", "Dentista", "Fisioterapeuta", "Gym"],
+    "Regalos": ["Regalo"],
+    "Viajes y Hoteles": ["Hotel/Hostal", "Hotel Despedida Sergio"]
 }

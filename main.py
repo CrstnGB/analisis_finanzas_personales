@@ -290,7 +290,8 @@ with PdfPages('prueba.pdf') as pdf:
 
         valor_outlier_alto = max(_df['Importe']) * (-1)
         valor_outlier_bajo = min(_df['Importe']) * (-1)
-        ax1_1_3.axhspan(valor_outlier_bajo, valor_outlier_alto, facecolor=colores[i], alpha=0.3, label=f"[{math.ceil(valor_outlier_bajo)},{math.ceil(valor_outlier_alto)}]")
+        ax1_1_3.axhspan(valor_outlier_bajo, valor_outlier_alto, facecolor=colores[i], alpha=0.3,
+                        label=f"[{math.ceil(valor_outlier_bajo)},{math.ceil(valor_outlier_alto)}]")
         ax1_1_3.axhline(y = valor_outlier_alto, color = colores[i], linestyle = '--', linewidth = 0.7)
         ax1_1_3.axhline(y=valor_outlier_bajo, color=colores[i], linestyle='--', linewidth=0.7)
 
@@ -305,7 +306,8 @@ with PdfPages('prueba.pdf') as pdf:
 
         valor_outlier_alto = max(_df['Importe'])
         valor_outlier_bajo = min(_df['Importe'])
-        ax1_1_3.axhspan(valor_outlier_bajo, valor_outlier_alto, facecolor=colores[i], alpha=0.3, label=f"[{math.floor(valor_outlier_bajo)},{math.floor(valor_outlier_alto)}]")
+        ax1_1_3.axhspan(valor_outlier_bajo, valor_outlier_alto, facecolor=colores[i], alpha=0.3,
+                        label=f"[{math.floor(valor_outlier_bajo)},{math.floor(valor_outlier_alto)}]")
         ax1_1_3.axhline(y=valor_outlier_alto, color=colores[i], linestyle='--', linewidth=0.7)
         ax1_1_3.axhline(y=valor_outlier_bajo, color=colores[i], linestyle='--', linewidth=0.7)
 
@@ -315,7 +317,6 @@ with PdfPages('prueba.pdf') as pdf:
     #3.2- AGRUPACION DE VARIABLES CATEGÓRICAS
     #INGRESOS
 
-    #df_ingresos['Concepto'][df_ingresos['Concepto'].str.contains('construcciones ferroviarias')] = 'trf. construcciones ferroviarias de madrid sl'
 
     '''Se puede crear unas categorizaciones superiores según:
     
@@ -361,9 +362,11 @@ with PdfPages('prueba.pdf') as pdf:
 
             #Se escribe sobre la nueva columna accediendo al json
             for clave, valor in datos_json.items():
-                if isinstance(valor, list):
-                    valor = '|'.join(valor)
-                df.loc[df['Concepto'].str.contains(valor, case = False), columna] = clave
+                valor = '|'.join(valor)
+                if columna == nuevas_columnas[0]:
+                    df.loc[df['Concepto'].str.contains(valor, case = False), columna] = clave
+                else:
+                    df.loc[df[nuevas_columnas[0]].str.contains(valor, case=False), columna] = clave
 
             df.loc[df[columna].isna(), columna] = 'Otros'
         return df

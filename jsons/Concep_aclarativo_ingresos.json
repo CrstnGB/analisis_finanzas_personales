@@ -1,7 +1,7 @@
 {
-    "Cofema": "construcciones ferroviarias",
-    "Pension Baja Pat/Mat": "pension",
-    "Navantia Adecco": "adecco",
-    "Vitalia": "cristina miras",
-    "Hacienda": "a.e.a.t"
+    "Cofema": ["construcciones ferroviarias"],
+    "Pension Baja Pat/Mat": ["pension"],
+    "Navantia Adecco": ["adecco"],
+    "Vitalia": ["cristina miras"],
+    "Declaracion Renta": ["a.e.a.t"]
 }
