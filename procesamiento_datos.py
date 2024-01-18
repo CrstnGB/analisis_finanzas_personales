@@ -2,16 +2,19 @@ import pandas as pd
 from functions.func_auxiliares import *
 import numpy as np
 import math
+import warnings
 import os
-import json
+from pandas.errors import SettingWithCopyWarning
+warnings.filterwarnings("ignore", category=SettingWithCopyWarning)
 
 def preprocesamiento ():
     # 1- INGESTA Y PROCESADO INICIAL
 
     # 1.1- Importar datos
-    ruta = r'C:\Users\Cristian\Documents\6- Proyectos\2- Python\2-Analisis finanzas personales\Extractos Bancarios'
     nombre_archivo = '01.01.2023-15.12.2023.comb.xlsx'
-    df = pd.read_excel(ruta + "/" + nombre_archivo)
+    directorio = os.path.abspath('Extractos Bancarios')
+    ruta = os.path.join(directorio, nombre_archivo)
+    df = pd.read_excel(ruta)
 
     # Se eliminan las tildes del dataframe para evitar errores de lectura
     # Función para eliminar tildes
@@ -23,7 +26,6 @@ def preprocesamiento ():
     df.drop(['Fecha valor', 'Nro. Apunte'], axis=1, inplace=True)
 
     # 1.3- Relacionar los tipos de datos en el dataset
-    print(df.dtypes)
     # Se convierte la columna de Fecha en un tipo de dato Fecha y Concepto en Category
     df['Fecha'] = pd.to_datetime(df['Fecha'], dayfirst=True)
     df['Concepto'] = df['Concepto'].astype('category')
@@ -185,6 +187,11 @@ def agrupacion_var_categoricas(df_ingresos, df_gastos):
     # Por descarte, el resto son transferencias
     df_ingresos['Tipo_Pago'][df_ingresos['Tipo_Pago'].isna()] = 'Transferencia'
 
+    # Una vez está todo categorizado en Tipo_Pago,
+    # se procede a la normalización del concepto antes de estudiar la categorización como Tipo_Concepto
+    df_ingresos['Concepto'] = df_ingresos['Concepto'].str.replace('abono bizum - ', '')
+    df_ingresos['Concepto'] = df_ingresos['Concepto'].str.replace('trf. ', '')
+
     '''Se van a crear unas categorías superiores para una mayor agrupación de conceptos. 
     Esto es un trabajo muy personal porque dependerá en gran medida del dueño del dataset. 
     La cantidad y el detalle que se quiera alcanzar dependerá será una decisión personal. 
@@ -211,14 +218,14 @@ def agrupacion_var_categoricas(df_ingresos, df_gastos):
     def obtener_clasificaciones(df, tipo):
         # Asignaciones de concepto aclarativo
         # Obtener la ruta al directorio actual del script
-        directorio_actual = os.path.dirname(os.path.abspath(__file__))
+        rutas_jsons = definir_rutas_jsons()
         nuevas_columnas = ['Concep_Aclarativo', 'Concep_Categoria']
         for columna in nuevas_columnas:
             # Construir la ruta al archivo dentro de la carpeta relativa
-            ruta_archivo = os.path.join(directorio_actual, 'jsons', f'{columna}_{tipo}.json')
+            nombre_archivo = f'{columna}_{tipo}'
+            ruta_archivo = rutas_jsons[nombre_archivo]
             # Leer el archivo JSON
-            with open(ruta_archivo, 'r', encoding='utf-8') as archivo_json:
-                datos_json = json.load(archivo_json)
+            datos_json = leer_json(ruta_archivo)
 
             # Se escribe sobre la nueva columna accediendo al json
             for clave, valor in datos_json.items():

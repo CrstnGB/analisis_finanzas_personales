@@ -1,17 +1,25 @@
-import matplotlib.pyplot as plt
 from matplotlib.gridspec import GridSpec, GridSpecFromSubplotSpec
 from matplotlib.backends.backend_pdf import PdfPages
 import math
 from datetime import datetime
 from functions.func_charts import *
 import procesamiento_datos as process
+import os
 
+# 1- INGESTA Y PROCESADO INICIAL
+df = process.preprocesamiento()
+primer_dia = min(df['Fecha'])
+ultimo_dia = max(df['Fecha'])
+n_dias = (ultimo_dia - primer_dia).days
 
 # 0-PreConfiguración para las gráficas
 
 #Creo un objeto PdfPages para almacenar las figuras en un archivo PDF
-
-with PdfPages('prueba.pdf') as pdf:
+nombre_pdf = f"{datetime.now().strftime('%d.%m.%Y')}.KPI_Economia_del_{primer_dia.strftime('%d.%m.%Y')}_al_" \
+             f"{ultimo_dia.strftime('%d.%m.%Y')}.pdf"
+directorio_outputs = os.path.abspath('Outputs KPIs')
+ruta_output = os.path.join(directorio_outputs, nombre_pdf)
+with PdfPages(ruta_output) as pdf:
 
     # 0.1- Configurar parámetros de gráficas
 
@@ -72,7 +80,7 @@ with PdfPages('prueba.pdf') as pdf:
     colores_I_G = ['#196F3D', '#E74C3C']
 
     # 1- INGESTA Y PROCESADO INICIAL
-    df = process.preprocesamiento()
+    #df = process.preprocesamiento()
     #GRAFICADO
     salary_tracing(df, ax1_1_1)
 
@@ -155,9 +163,6 @@ with PdfPages('prueba.pdf') as pdf:
     df_ingresos, df_gastos = process.agrupacion_var_categoricas(df_ingresos, df_gastos)
 
     #Distribucion de variables categóricas
-    primer_dia = min(df['Fecha'])
-    ultimo_dia = max(df['Fecha'])
-    n_dias = (ultimo_dia - primer_dia).days
 
     #Se escribe una función para estampar la fecha en una figura y el rango de fechas analizado
     def estampar_fechas(fig):
