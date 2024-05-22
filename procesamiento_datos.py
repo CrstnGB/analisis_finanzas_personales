@@ -1,4 +1,3 @@
-import pandas as pd
 from functions.func_auxiliares import *
 import numpy as np
 import math
@@ -7,12 +6,11 @@ import os
 from pandas.errors import SettingWithCopyWarning
 warnings.filterwarnings("ignore", category=SettingWithCopyWarning)
 
-def preprocesamiento ():
+def preprocesamiento(nombre_archivo):
     # 1- INGESTA Y PROCESADO INICIAL
 
     # 1.1- Importar datos
-    nombre_archivo = '01.01.2023-15.12.2023.comb.xlsx'
-    directorio = os.path.abspath('Extractos Bancarios')
+    directorio = os.path.abspath('Extractos_Bancarios')
     ruta = os.path.join(directorio, nombre_archivo)
     df = pd.read_excel(ruta)
 
@@ -39,7 +37,8 @@ def preprocesamiento ():
             pass
         else:
             df['Saldo'].iloc[i] = df['Saldo'].iloc[i - 1] + fila['Importe']
-
+    #Se crea una columna para distinguir entre ingresos y gastos
+    df['Tipo_Movimiento'] = df['Importe'].apply(lambda x: "Ingreso" if x >= 0 else 'Gasto')
     return df
 
 def separacion_ingresos_gastos(df):
@@ -83,6 +82,8 @@ def agrupacion_var_continuas(df_ingresos, df_gastos):
     '''
 
     def calcular_outliers(df):
+        #Se eliminan las filas con valor de importe 0
+        df = df[df['Importe'] != 0]
         cuartiles = np.percentile(df['Importe'], [25, 50, 75])
         iqr = np.subtract(*np.percentile(df['Importe'], [75, 25]))
 
@@ -284,3 +285,7 @@ def agrupacion_var_categoricas(df_ingresos, df_gastos):
     df_gastos = obtener_clasificaciones(df_gastos, 'gastos')
 
     return df_ingresos, df_gastos
+
+
+
+

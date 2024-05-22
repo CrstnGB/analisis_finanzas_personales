@@ -1,8 +1,9 @@
 import pandas as pd
+import os
 
-ruta = r'C:\Users\Cristian\Documents\6- Proyectos\2- Python\2-Analisis finanzas personales\Extractos Bancarios'
-nombre_archivo1 = '01.01.2023-15.12.2023'
-nombre_archivo2 = '01.01.2023-15.12.2023 CREDITO'
+ruta = os.path.abspath("Extractos_Bancarios")
+nombre_archivo1 = input("Ingresa el nombre del primer archivo (sin extensión): ")
+nombre_archivo2 = input("Ingresa el nombre del segundo archivo (sin extensión): ")
 df1 = pd.read_excel(ruta + "/" + nombre_archivo1 + ".xlsx")
 df2 = pd.read_excel(ruta + "/" + nombre_archivo2 + ".xlsx")
 

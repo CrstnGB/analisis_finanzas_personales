@@ -2,3 +2,8 @@ venv/
 .idea/
 pruebas.py
 prueba.pdf
+Extractos_Bancarios/*
+Outputs_KPIS/*
+Recursos_GUI/*
+Reporte.pbix
+dfs_output.xlsx

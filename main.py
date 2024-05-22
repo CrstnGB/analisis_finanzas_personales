@@ -1,13 +1,22 @@
 from matplotlib.gridspec import GridSpec, GridSpecFromSubplotSpec
 from matplotlib.backends.backend_pdf import PdfPages
 import math
-from datetime import datetime
+import pandas as pd
 from functions.func_charts import *
+from functions.func_auxiliares import *
 import procesamiento_datos as process
 import os
+from prevision import prevision
+from scipy.interpolate import interp1d
+
+#Creo un objeto excel para guardar ahi toda la información y exportarla
+excel_writer = pd.ExcelWriter("dfs_output.xlsx", engine = 'xlsxwriter')
 
 # 1- INGESTA Y PROCESADO INICIAL
-df = process.preprocesamiento()
+nombre_archivo = input("Ingresa el nombre del archivo a analizar (sin extensión): ")
+nombre_archivo += ".xlsx"
+df = process.preprocesamiento(nombre_archivo = nombre_archivo)
+
 primer_dia = min(df['Fecha'])
 ultimo_dia = max(df['Fecha'])
 n_dias = (ultimo_dia - primer_dia).days
@@ -17,8 +26,9 @@ n_dias = (ultimo_dia - primer_dia).days
 #Creo un objeto PdfPages para almacenar las figuras en un archivo PDF
 nombre_pdf = f"{datetime.now().strftime('%d.%m.%Y')}.KPI_Economia_del_{primer_dia.strftime('%d.%m.%Y')}_al_" \
              f"{ultimo_dia.strftime('%d.%m.%Y')}.pdf"
-directorio_outputs = os.path.abspath('Outputs KPIs')
+directorio_outputs = os.path.abspath('Outputs_KPIs')
 ruta_output = os.path.join(directorio_outputs, nombre_pdf)
+
 with PdfPages(ruta_output) as pdf:
 
     # 0.1- Configurar parámetros de gráficas
@@ -80,12 +90,39 @@ with PdfPages(ruta_output) as pdf:
     colores_I_G = ['#196F3D', '#E74C3C']
 
     # 1- INGESTA Y PROCESADO INICIAL
-    #df = process.preprocesamiento()
+    '''Para el graficado de la evolución del salario, con el fin de que coincida siempre la línea temporal 
+    del extracto en análisis y la previsón, se va a crear una línea temporal completa del año de dicho extracto
+    y luego se agrupará por fecha. De esta manera, se obtendrá un df que contendrá todos los días del año.'''
     #GRAFICADO
+    df = crear_calendario_anual(df)
     salary_tracing(df, ax1_1_1)
+
+    #Se grafica la previsión
+    X_train, y_train, y_pred, salario_ini_prev = prevision()
+    #Como la cantidad de datos de la predicción y del actual df son distintos, se ha de interpolar
+    f_interpoladora = interp1d(X_train, y_pred) #Se crea función interpoladora
+    #Se crea una nueva lista de coordenadas x con misma longitud del df
+    nueva_longitud = len(df.iloc[:,0])
+    X_nuevo = np.linspace(min(X_train), max(X_train), nueva_longitud)
+    #Se calculan las coordenadas interpoladas
+    y_pred_nuevo = f_interpoladora(X_nuevo)
+    #Ahora, como la previsión se basa en los datos del año anterior, el salario inicial debe ser ajustado así como el
+    #resto de datos
+    salario_ini = obtener_salario_ini(df)
+    dif_salario_ini = y_pred_nuevo[0] - salario_ini
+    #se recalculan todos los datos de y_pred_nuevo
+    y_pred_nuevo -= dif_salario_ini
+    df['y_pred'] = y_pred_nuevo
+    #Se plotea
+    ax1_1_1.plot(df['Fecha'], y_pred_nuevo, color = 'r', label = 'Tendencia prevista')
+    ax1_1_1.legend(bbox_to_anchor=(1, 1))
+
+    df.to_excel(excel_writer, sheet_name='df')
 
     # 2- SEGREGACIÓN DE DATOS
     df_ingresos, df_gastos = process.separacion_ingresos_gastos(df)
+    df_ingresos.to_excel(excel_writer, sheet_name='df_ingresos')
+    df_gastos.to_excel(excel_writer, sheet_name='df_gastos')
     #GRAFICADO
     acum_comparison(df_ingresos, df_gastos, ax1_1_2)
     monthly_comparison(df_ingresos, df_gastos, ax1_1_4)
@@ -94,6 +131,8 @@ with PdfPages(ruta_output) as pdf:
     #3- AGRUPACION DE VARIABLES
     # 3.1- Agrupación de variables CONTINUAS
     df_ingresos, df_gastos = process.agrupacion_var_continuas(df_ingresos, df_gastos)
+    df_ingresos.to_excel(excel_writer, sheet_name='df_ingresos_var_cont')
+    df_gastos.to_excel(excel_writer, sheet_name='df_gastos_var_cont')
     #GRAFICADO
     #INGRESOS
     filtro = df_ingresos.groupby('Rango_Importe')['Importe'].sum().sort_values(ascending = False)
@@ -161,6 +200,8 @@ with PdfPages(ruta_output) as pdf:
 
     #3.2- AGRUPACION DE VARIABLES CATEGÓRICAS
     df_ingresos, df_gastos = process.agrupacion_var_categoricas(df_ingresos, df_gastos)
+    df_ingresos.to_excel(excel_writer, sheet_name='df_ingresos_var_cat')
+    df_gastos.to_excel(excel_writer, sheet_name='df_gastos_var_cat')
 
     #Distribucion de variables categóricas
 
@@ -269,3 +310,6 @@ with PdfPages(ruta_output) as pdf:
         estampar_fechas(fig)
         pdf.savefig()
         plt.close()
+
+    excel_writer._save()
+    excel_writer.close()
