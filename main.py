@@ -1,7 +1,6 @@
 from matplotlib.gridspec import GridSpec, GridSpecFromSubplotSpec
 from matplotlib.backends.backend_pdf import PdfPages
 import math
-import pandas as pd
 from functions.func_charts import *
 from functions.func_auxiliares import *
 import procesamiento_datos as process

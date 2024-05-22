@@ -1,14 +1,14 @@
 [
     {
     "Fecha": ["2023-03-25"],
-    "Concepto": ["Regalo boda"],
+    "Concepto": ["Regalo boda Lorena y Alberto"],
     "Importe": [1000],
     "Concep_Aclarativo": ["Regalo"],
     "Concep_Categoria": ["Regalo"]
     },
     {
     "Fecha": ["2023-08-01"],
-    "Concepto": ["Regalo boda 2"],
+    "Concepto": ["Regalo boda Juanjo Y Laura"],
     "Importe": [400],
     "Concep_Aclarativo": ["Regalo"],
     "Concep_Categoria": ["Regalo"]

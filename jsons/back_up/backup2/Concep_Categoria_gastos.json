@@ -1,0 +1,56 @@
+{
+  "Gastos Domesticos": [
+    "Supermercados",
+    "Electricidad",
+    "Agua",
+    "Internet y movil",
+    "Servicio Limpieza"
+  ],
+  "Transporte": [
+    "Gasolina",
+    "Prestamo Coche",
+    "Garaje",
+    "Mantenimiento Coche",
+    "Seguro coche"
+  ],
+  "Hogar": [
+    "Seguro Hogar",
+    "IBI",
+    "Hipoteca Hogar",
+    "Comunidad Hogar"
+  ],
+  "Mejora Hogar": [
+    "Ref. Cocina",
+    "Ref. Despacho",
+    "Ref. Ventanas",
+    "Inst. Aire Acond."
+  ],
+  "Ocio": [
+    "Cafet, Bares y Rest.",
+    "Cine"
+  ],
+  "Impuestos Hacienda": [
+    "Declaracion Renta"
+  ],
+  "Formacion": [
+    "M. Big Data y DS"
+  ],
+  "Compras Tiendas y web": [
+    "Compras Web",
+    "Compra Tiendas"
+  ],
+  "Salud": [
+    "Farmacia",
+    "Seguro Salud",
+    "Dentista",
+    "Fisioterapeuta",
+    "Gym"
+  ],
+  "Regalos": [
+    "Regalo"
+  ],
+  "Viajes y Hoteles": [
+    "Hotel/Hostal",
+    "Hotel Despedida Sergio"
+  ]
+}
