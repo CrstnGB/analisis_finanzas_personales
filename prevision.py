@@ -4,11 +4,14 @@ import matplotlib.pyplot as plt
 import numpy as np
 from datetime import datetime
 import functions.func_auxiliares as aux
+from sklearn.preprocessing import PolynomialFeatures
+from sklearn import linear_model
 
 
 def procesar_datos():
     # 1- INGESTA Y PROCESADO INICIAL
-    df = process.preprocesamiento(nombre_archivo = '01.01.2023-15.12.2023.comb.xlsx')
+    nombre_archivo = input("Ingresa el nombre del extracto usado para la previsión del balance (sin extensión): ")
+    df = process.preprocesamiento(nombre_archivo = nombre_archivo)
     salario_ini_prev = aux.obtener_salario_ini(df)
     print(f'Salario inicial (extracto para previsión): {salario_ini_prev}')
     # 2- SEGREGACIÓN DE DATOS
@@ -104,8 +107,6 @@ def prevision():
     y_train = df_transformado['Saldo']
 
     #Se genera el modelo de ML
-    from sklearn.preprocessing import PolynomialFeatures
-    from sklearn import linear_model
 
     #Se define el grado del polinomio
     poli_reg = PolynomialFeatures(degree = 6)
