@@ -1,6 +1,7 @@
 venv/
 .venv/
 .idea/
+__pycache__/
 pruebas.py
 prueba.pdf
 Extractos_Bancarios/*
