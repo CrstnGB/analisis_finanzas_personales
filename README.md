@@ -1,7 +1,7 @@
-*INTRO*
+# INTRO
 Este es un proyecto personal que surge de la necesidad de controlar de la forma más eficiente posible mis finanzas personales sin necesidad de utilizar aplicaciones de terceros, ya que prefiero evitar compartir información sensible.
 
-**Bases de funcionamiento**
+## Bases de funcionamiento
 Este proyecto consta de tres etapas.
 - **Ingesta de datos**: a partir de un extracto bancario excel, el programa será capaz de extraer los datos, preprocesarlo y realizar ciertas transformaciones. Por ejemplo, modificará la estructura de las columnas (eliminando columnas no usadas para el análisis, cambiando nombres de columnas...), separará en dos dataframes los ingresos y los gastos para un análisis por separado, creará clasificaciones de variables continuas de estos dataframes (los gastos y los ingresos) discretizándolos en rangos definidos por outliers, creará clasificaciones de variables categóricas como los conceptos, etc...
 - **Previsión**: dando otro extracto bancario, idealmente, del año anterior completo al del análisis, se generará una línea de previsión del balance general del año en curso usando el modelo de regresión lineal de *sklearn*. De esta manera, se aprovechan las ventajas del *Machine Learning* para la estimación del balance.
