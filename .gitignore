@@ -1,10 +1,14 @@
 venv/
+.venv/
 .idea/
 pruebas.py
 prueba.pdf
 Extractos_Bancarios/*
+!Extractos_Bancarios/.gitkeep
 Outputs_KPIS/*
+!Outputs_KPIS/.gitkeep
 Recursos_GUI/*
+jsons/back_up/*
 Reporte.pbix
 dfs_output.xlsx
 back_up/*
