@@ -17,3 +17,4 @@ six==1.16.0
 squarify==0.4.3
 threadpoolctl==3.5.0
 tzdata==2024.1
+XlsxWriter==3.2.0
