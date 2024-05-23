@@ -1,5 +1,6 @@
 # INTRO
 Este es un proyecto personal que surge de la necesidad de controlar de la forma más eficiente posible mis finanzas personales sin necesidad de utilizar aplicaciones de terceros, ya que prefiero evitar compartir información sensible.
+Consiste en un analizador de finanzas personales. El input principal son extractos bancarios del banco Caja Rural. Se clasifican los conceptos en categorías generales a gusto del usuario. Además, se discretizan los gastos e ingresos y se clasifican por rangos dinámicos identificando outliers recursivamente.
 
 ## Bases de funcionamiento
 Este proyecto consta de tres etapas.
